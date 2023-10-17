@@ -1,8 +1,17 @@
-FROM amazoncorretto:21
+FROM amazoncorretto:21 as build
 
-WORKDIR /java-test
+WORKDIR /app/
 
-COPY ./HolaMundo.class ./HolaMundo.class
+COPY volume/HolaMundo.java /app/
 
-CMD [ "java", "HolaMundo" ]
+RUN javac HolaMundo.java
 
+ENTRYPOINT [ "javac", "HolaMundo.java" ]
+
+FROM amazoncorretto:21-alpine-jdk as execute
+
+WORKDIR /app/
+
+COPY --from=build /app/HolaMundo.class /app/
+
+ENTRYPOINT [ "java", "HolaMundo" ]
